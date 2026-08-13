@@ -1671,13 +1671,12 @@ main {
 
 .site-footer strong a {
   color: inherit;
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .site-footer strong a:hover {
   color: var(--pine);
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 @media (max-width: 900px) {
