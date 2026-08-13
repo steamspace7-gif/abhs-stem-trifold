@@ -1438,6 +1438,18 @@ main {
   min-height: min(78vh, 640px);
 }
 
+.hero--about .hero-media img {
+  object-position: center 42%;
+  animation: none;
+  transform: none;
+}
+
+.hero--about .hero-shade {
+  background:
+    linear-gradient(180deg, rgba(20, 50, 40, 0.12) 0%, rgba(20, 50, 40, 0.38) 52%, rgba(20, 40, 32, 0.66) 100%),
+    radial-gradient(circle at 80% 20%, rgba(240, 180, 41, 0.22), transparent 40%);
+}
+
 .hero--about .hero-actions {
   max-width: 40rem;
 }
