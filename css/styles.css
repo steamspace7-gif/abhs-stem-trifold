@@ -1674,6 +1674,12 @@ main {
   text-decoration: none;
 }
 
+.site-footer strong a:hover {
+  color: var(--pine);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 @media (max-width: 900px) {
   .plan-steps--two,
   .skills-grid,
