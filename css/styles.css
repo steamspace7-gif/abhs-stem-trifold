@@ -1468,13 +1468,6 @@ main {
   animation: fade-up 0.8s 0.2s ease both;
 }
 
-.hero-place {
-  margin-top: 0.9rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
-  animation: fade-up 0.8s 0.22s ease both;
-}
-
 .purpose--flip {
   grid-template-columns: 1fr 1.05fr;
 }
