@@ -2,8 +2,8 @@
 <!--
   About ABHS STEM — web page for steamspace.vercel.app
   Drop-in: copy this file, css/styles.css (About ABHS STEM section), js/site.js,
-  and images/ into the STEAMSPACE site. Add an About nav item and footer link
-  on every page (see this file’s header/footer).
+  and images/ into the STEAMSPACE site. Do not add About to the nav. In the
+  footer, link the Together We Build logo to about-abhs-stem.html (see below).
 -->
 <html lang="en">
 <head>
@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=16">
+  <link rel="stylesheet" href="css/styles.css?v=17">
 </head>
 <body>
   <header class="site-header">
@@ -30,7 +30,6 @@
       <nav class="site-nav" id="site-nav" aria-label="Site">
         <ul>
           <li><a href="index.html">Home</a></li>
-          <li><a href="about-abhs-stem.html" class="active">About</a></li>
           <li class="has-submenu">
             <a href="choose.html">Choose</a>
             <ul class="submenu">
@@ -223,69 +222,6 @@
 
     <section class="section reveal">
       <div class="section-head">
-        <h2>Also at Building 106</h2>
-        <p>Elementary and middle school classes build real projects tied to Arizona grade-level standards at Fort Apache Historic Park.</p>
-      </div>
-      <div class="gallery">
-        <a class="gallery-item" href="lego-paper-building.html">
-          <figure>
-            <img src="images/lego-bear.jpg" alt="LEGO paper building bear on a green baseplate">
-            <figcaption class="gallery-caption">
-              <span class="gallery-title">LEGO Paper Building</span>
-              <span class="gallery-grade">2nd Grade</span>
-            </figcaption>
-          </figure>
-        </a>
-        <a class="gallery-item" href="paper-circuits.html">
-          <figure>
-            <img src="images/gallery-paper-circuits.jpg?v=2" alt="Hands building cardboard paper circuits with glowing blue LEDs">
-            <figcaption class="gallery-caption">
-              <span class="gallery-title">Paper Circuits</span>
-              <span class="gallery-grade">3rd Grade</span>
-            </figcaption>
-          </figure>
-        </a>
-        <a class="gallery-item gallery-item--lasercut" href="lasercut-boxes.html">
-          <figure>
-            <img src="images/gallery-lasercut-boxes.jpg?v=2" alt="Student assembling a laser-cut wooden box with mallet">
-            <figcaption class="gallery-caption">
-              <span class="gallery-title">Lasercut Boxes</span>
-              <span class="gallery-grade">4th Grade</span>
-            </figcaption>
-          </figure>
-        </a>
-        <a class="gallery-item" href="microbit-game.html">
-          <figure>
-            <img src="images/gallery-microbit-game.jpg" alt="Cardboard Micro:bit game with foil touch pads and wiring">
-            <figcaption class="gallery-caption">
-              <span class="gallery-title">Micro:bit Game</span>
-              <span class="gallery-grade">5th Grade</span>
-            </figcaption>
-          </figure>
-        </a>
-        <a class="gallery-item" href="puzzle-design.html">
-          <figure>
-            <img src="images/puzzlepic1_edited.jpg" alt="Student-designed geometric laser-cut puzzle">
-            <figcaption class="gallery-caption">
-              <span class="gallery-title">Puzzle Design</span>
-              <span class="gallery-grade">6th Grade</span>
-            </figcaption>
-          </figure>
-        </a>
-        <a class="gallery-item" href="choose.html">
-          <figure>
-            <img src="images/building-106.jpg" alt="Building 106 at Fort Apache STEAMSPACE">
-            <figcaption class="gallery-caption">
-              <span class="gallery-title">STEAMSPACE Field Trips</span>
-              <span class="gallery-grade">Choose a project</span>
-            </figcaption>
-          </figure>
-        </a>
-      </div>
-    </section>
-
-    <section class="section reveal">
-      <div class="section-head">
         <h2>Why STEM?</h2>
       </div>
       <div class="why-stem">
@@ -329,7 +265,10 @@
       <div class="footer-logo-wrap">
         <img class="footer-logo" src="images/logo-cleaned.png?v=6" alt="STEAMSPACE at Fort Apache — Hands-on Field Trips" width="200" height="101">
       </div>
-      <strong><a href="about-abhs-stem.html">ABHS STEM</a></strong>
+      <a class="footer-together" href="about-abhs-stem.html">
+        <img src="images/togetherwebuild.png" alt="Nohwíí Adhi'dle' — Together We Build">
+        <span class="footer-together-label">About ABHS STEM</span>
+      </a>
       <p><a href="mailto:steamspace@wmabhs.org">steamspace@wmabhs.org</a></p>
       <p><a href="donate.html">Donate Supplies</a></p>
       <p>Building 106 · Fort Apache Historic Park</p>
