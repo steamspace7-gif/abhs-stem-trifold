@@ -1438,6 +1438,19 @@ main {
   min-height: min(78vh, 640px);
 }
 
+.hero--about .hero-actions {
+  max-width: 40rem;
+}
+
+.hero--about .hero-actions .btn {
+  font-size: 0.95rem;
+  padding: 0.65rem 1.05rem;
+}
+
+.section[id] {
+  scroll-margin-top: 5.5rem;
+}
+
 .hero--about h1 {
   max-width: none;
 }
