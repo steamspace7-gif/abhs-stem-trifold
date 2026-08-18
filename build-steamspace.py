@@ -295,21 +295,19 @@ def build() -> str:
     </div>
   </div>"""
 
-    outside_center = f"""  <!-- Back cover: booking steps and contact -->
+    outside_center = f"""  <!-- Back cover: contact and booking destination, not the inside steps -->
   <div class="panel outside-center wash-sand">
     <div class="kicker">Book a Field Trip</div>
     <h2>Ready for your class?</h2>
-    <p>Choose a project, pick a Tuesday or Thursday, and confirm arrival details with our team.</p>
-
-{plan_steps([
-        ("Choose a grade-level project", "2nd LEGO Paper Building · 3rd Paper Circuits · 4th Laser-Cut Boxes · 5th micro:bit Games · 6th Puzzle Design, or other grade-level project on the website."),
-        ("Schedule your trip", "Check open dates and send the Field Trip Interest Form online."),
-        ("Confirm with our team", "Finalize timing, museum visit options, and arrival. Use the contact information below."),
-    ])}
+    <p>Start on the site. Send the Field Trip Interest Form online, then use the contact below so we can confirm your date.</p>
 
     <div class="url-line">{SITE_URL}</div>
 
-    <div class="cta-box">
+    <div class="tile-grid" style="grid-template-columns: 1fr; margin-bottom: 0.12in;">
+{tile('tile_brochurepic', 'Hands-on making at STEAMSPACE', '2ND–6TH GRADE', 'tile--wide')}
+    </div>
+
+    <div class="cta-box" style="margin-top: auto;">
       <h3>Contact STEAMSPACE</h3>
       <p style="font-weight: 700; margin-bottom: 0.06in;">steamspace@wmabhs.org</p>
       <p>Call or text<br>928-299-0027<br>928-221-1934</p>
@@ -356,8 +354,8 @@ def build() -> str:
     <h2>Planning a Hands-on Field Trip</h2>
 
 {plan_steps([
-        ("Choose a Field Trip Project", "Pick a grade-level project designed for your class."),
-        ("Schedule Your Trip", "Trips run Tuesdays and Thursdays. Check the calendar and submit the interest form."),
+        ("Choose a Field Trip Project", "Pick a grade-level project designed for your class, or other grade-level project on the website."),
+        ("Schedule Your Trip", "Trips run Tuesdays and Thursdays. Check the calendar and send the Field Trip Interest Form online."),
         ("Contact Us and Confirm", "Finalize timing, museum visit options, and arrival details."),
     ])}
 
