@@ -19,6 +19,7 @@ ROOT = Path(__file__).parent
 OUT = ROOT / "steamspace-brochure.html"
 PDF = ROOT / "steamspace-brochure.pdf"
 PREVIEW = ROOT / "steamspace-brochure-preview.png"
+COVER = ROOT / "steamspace-brochure-cover.png"
 
 SITE_URL = "steamspace.vercel.app"
 
@@ -43,14 +44,29 @@ def knock_out_black(path: Path, threshold: int = 28) -> Image.Image:
     return im
 
 
-LOGO_CLEAR = png_uri(knock_out_black(abhs.ASSETS / "logo_stem_trimmed.png"))
+def logo_on_sand(path: Path) -> Image.Image:
+    """Composite the knocked-out logo onto opaque sand.
+
+    Chrome print flattens <img> alpha against the page photo, not the parent
+    box, so a transparent PNG makes the framed sand look ~40% even when the
+    CSS fill is 100%.
+    """
+    logo = knock_out_black(path)
+    canvas = Image.new("RGBA", logo.size, (247, 241, 230, 255))
+    canvas.alpha_composite(logo)
+    return canvas.convert("RGB")
+
+
+LOGO_CLEAR = png_uri(logo_on_sand(abhs.ASSETS / "logo_stem_trimmed.png"))
 COVER_HERO = abhs.data_uri("photos/cover-hero.jpg")
 
 EXTRA_CSS = """
 .cover-logo-wrap {
   width: 92%;
   margin: 0 auto 0.16in;
-  padding: 0.08in 0.1in 0.07in;
+  padding: calc(0.08in + 5px) 0.1in 0.07in;
+  /* Solid sand. CSS rgba over the darkened cover photo reads far thinner
+     than the alpha number (75% looked like ~40% in print). */
   background: var(--sand);
   border: 2.5px solid var(--pine);
   border-radius: 12px;
@@ -62,6 +78,7 @@ EXTRA_CSS = """
   object-fit: contain;
   display: block;
   margin: 0;
+  background: var(--sand);
 }
 .cover-url {
   margin-top: auto;
@@ -378,35 +395,36 @@ def main() -> None:
             chrome = candidate
             break
 
-    subprocess.run(
-        [
-            chrome, "--headless", "--disable-gpu", "--no-sandbox",
-            "--no-pdf-header-footer",
-            f"--print-to-pdf={PDF}",
-            OUT.as_uri(),
-        ],
-        check=True,
-        capture_output=True,
-        timeout=90,
-    )
-    print(f"Wrote {PDF.name} ({PDF.stat().st_size / 1024:.0f} KB)")
-
+    before = PDF.stat().st_mtime if PDF.exists() else 0
     try:
         subprocess.run(
             [
                 chrome, "--headless", "--disable-gpu", "--no-sandbox",
-                "--window-size=1056,1632",
-                "--virtual-time-budget=8000",
-                f"--screenshot={PREVIEW}",
+                "--no-pdf-header-footer",
+                f"--print-to-pdf={PDF}",
                 OUT.as_uri(),
             ],
             check=True,
             capture_output=True,
-            timeout=60,
+            timeout=90,
         )
-        print(f"Wrote {PREVIEW.name}")
-    except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as exc:
-        print(f"Preview screenshot skipped ({type(exc).__name__})")
+    except subprocess.TimeoutExpired:
+        if not PDF.exists() or PDF.stat().st_mtime <= before:
+            raise
+        print("Chrome hung after writing PDF; continuing")
+    print(f"Wrote {PDF.name} ({PDF.stat().st_size / 1024:.0f} KB)")
+
+    try:
+        import pypdfium2 as pdfium
+        doc = pdfium.PdfDocument(str(PDF))
+        page = doc[0]
+        img = page.render(scale=2.5).to_pil()
+        img.save(PREVIEW)
+        width, height = img.size
+        img.crop((round(width * 2 / 3), 0, width, height)).save(COVER)
+        print(f"Wrote {PREVIEW.name} and {COVER.name}")
+    except Exception as exc:
+        print(f"Preview raster skipped ({type(exc).__name__}: {exc})")
 
 
 if __name__ == "__main__":
