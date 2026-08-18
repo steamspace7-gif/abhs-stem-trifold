@@ -20,6 +20,8 @@ OUT = ROOT / "steamspace-brochure.html"
 PDF = ROOT / "steamspace-brochure.pdf"
 PREVIEW = ROOT / "steamspace-brochure-preview.png"
 COVER = ROOT / "steamspace-brochure-cover.png"
+PAGE1 = ROOT / "steamspace-brochure-page-1.png"
+PAGE2 = ROOT / "steamspace-brochure-page-2.png"
 
 SITE_URL = "steamspace.vercel.app"
 
@@ -485,7 +487,10 @@ def main() -> None:
         img.save(PREVIEW)
         width, height = img.size
         img.crop((round(width * 2 / 3), 0, width, height)).save(COVER)
-        print(f"Wrote {PREVIEW.name} and {COVER.name}")
+        img.save(PAGE1)
+        if len(doc) > 1:
+            doc[1].render(scale=2.5).to_pil().save(PAGE2)
+        print(f"Wrote {PREVIEW.name}, {COVER.name}, {PAGE1.name}, and {PAGE2.name}")
     except Exception as exc:
         print(f"Preview raster skipped ({type(exc).__name__}: {exc})")
 
