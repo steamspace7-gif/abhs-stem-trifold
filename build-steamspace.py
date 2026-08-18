@@ -47,17 +47,21 @@ LOGO_CLEAR = png_uri(knock_out_black(abhs.ASSETS / "logo_stem_trimmed.png"))
 COVER_HERO = abhs.data_uri("photos/cover-hero.jpg")
 
 EXTRA_CSS = """
-.cover-logo {
+.cover-logo-wrap {
   width: 92%;
-  max-height: 1.55in;
+  margin: 0 auto 0.16in;
+  padding: 0.08in 0.1in 0.07in;
+  background: var(--sand);
+  border: 2.5px solid var(--pine);
+  border-radius: 12px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+}
+.cover-logo {
+  width: 100%;
+  max-height: 1.42in;
   object-fit: contain;
   display: block;
-  margin: 0 auto 0.14in;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.55));
-}
-.cover .kicker {
-  align-self: center;
-  margin-bottom: 0.12in;
+  margin: 0;
 }
 .cover-url {
   margin-top: auto;
@@ -220,8 +224,9 @@ def build() -> str:
     </div>
     <div class="cover-shade"></div>
     <div class="cover-content">
-      <img class="cover-logo" src="{LOGO_CLEAR}" alt="STEAMSPACE at Fort Apache — Hands-on Field Trips">
-      <div class="kicker">For School Teachers</div>
+      <div class="cover-logo-wrap">
+        <img class="cover-logo" src="{LOGO_CLEAR}" alt="STEAMSPACE at Fort Apache — Hands-on Field Trips">
+      </div>
       <div class="hero-text">2nd through 6th Grade</div>
       <div class="cover-rule"></div>
       <p class="hero-text" style="white-space: normal; max-width: 22ch;">Students build real projects tied to Arizona grade-level standards.</p>
