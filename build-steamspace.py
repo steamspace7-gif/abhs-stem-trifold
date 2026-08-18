@@ -34,6 +34,13 @@ def png_uri(im: Image.Image) -> str:
     return f"data:image/png;base64,{encoded}"
 
 
+def jpeg_uri(im: Image.Image, quality: int = 88) -> str:
+    buf = io.BytesIO()
+    im.save(buf, format="JPEG", quality=quality, optimize=True)
+    encoded = base64.b64encode(buf.getvalue()).decode("ascii")
+    return f"data:image/jpeg;base64,{encoded}"
+
+
 SAND_RGB = (247, 241, 230)
 SAND = "#f7f1e6"
 
@@ -108,9 +115,16 @@ def footer_logo_on_sand(path: Path, scale: int = 2) -> Image.Image:
     return sand.convert("RGB")
 
 
+def sand_blend_photo(path: Path, amount: float = 0.26) -> Image.Image:
+    """Wash the cover photo toward sand so the framed boxes sit in the same palette."""
+    photo = Image.open(path).convert("RGB")
+    wash = Image.new("RGB", photo.size, SAND_RGB)
+    return Image.blend(photo, wash, amount)
+
+
 LOGO_CLEAR = png_uri(logo_on_sand(abhs.ASSETS / "logo_stem_trimmed.png"))
 COVER_LOGO = png_uri(footer_logo_on_sand(abhs.ASSETS / "logo-cleaned.png"))
-COVER_HERO = abhs.data_uri("photos/cover-hero.jpg")
+COVER_HERO = jpeg_uri(sand_blend_photo(abhs.ASSETS / "photos/cover-hero.jpg"))
 
 EXTRA_CSS = """
 .cover .cover-content {
@@ -248,7 +262,22 @@ EXTRA_CSS = """
   margin-bottom: 0;
   line-height: 1.32;
 }
-.cover-media img { object-position: center 42%; }
+.cover-media img {
+  object-position: center 42%;
+}
+.cover .cover-shade {
+  background:
+    linear-gradient(180deg,
+      rgba(72, 58, 40, 0.28) 0%,
+      rgba(58, 48, 34, 0.18) 28%,
+      rgba(44, 38, 28, 0.24) 55%,
+      rgba(34, 28, 22, 0.42) 82%,
+      rgba(24, 20, 16, 0.62) 100%),
+    linear-gradient(180deg,
+      rgba(247, 241, 230, 0.16) 0%,
+      rgba(247, 241, 230, 0.06) 45%,
+      rgba(247, 241, 230, 0.12) 100%);
+}
 .coming-tile .coming-copy {
   font-size: 7.8pt;
   font-weight: 600;
