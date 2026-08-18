@@ -11,7 +11,7 @@ import io
 import subprocess
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageChops, ImageEnhance, ImageFilter
 
 import build as abhs
 
@@ -57,31 +57,93 @@ def logo_on_sand(path: Path) -> Image.Image:
     return canvas.convert("RGB")
 
 
+def footer_logo_on_sand(
+    path: Path,
+    scale: int = 2,
+    stroke: int = 2,
+    letter_extra: int = 5,
+) -> Image.Image:
+    """Site footer mark: 2x upsample, thicker black letter outlines, sand bake.
+
+    The live footer uses images/logo-cleaned.png in .footer-logo-wrap. Native
+    535x269 gets fuzzy on a print cover; a dilated black stroke behind the
+    STEAMSPACE @ Ft Apache lettering keeps the wordmark readable.
+    """
+    src = Image.open(path).convert("RGBA")
+    width, height = src.size
+    src = src.resize((width * scale, height * scale), Image.Resampling.LANCZOS)
+    pixels = src.load()
+    width, height = src.size
+    for y in range(height):
+        for x in range(width):
+            r, g, b, a = pixels[x, y]
+            if a < 24:
+                pixels[x, y] = (0, 0, 0, 0)
+            elif r < 36 and g < 36 and b < 36:
+                pixels[x, y] = (16, 14, 12, 255 if a > 80 else a)
+
+    alpha = src.getchannel("A")
+    body = alpha.point(lambda value: 255 if value >= 40 else 0)
+    dilated = body.filter(ImageFilter.MaxFilter(stroke * 2 + 1))
+    letter_h = int(height * 0.42)
+    letter = Image.new("L", (width, height), 0)
+    letter.paste(body.crop((0, 0, width, letter_h)), (0, 0))
+    letter_dilated = letter.filter(
+        ImageFilter.MaxFilter((stroke + letter_extra) * 2 + 1)
+    )
+    stroke_mask = ImageChops.lighter(dilated, letter_dilated)
+
+    outlined = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    outlined.paste(Image.new("RGBA", (width, height), (12, 10, 8, 255)), mask=stroke_mask)
+    outlined.alpha_composite(src)
+
+    rgb = ImageEnhance.Sharpness(outlined.convert("RGB")).enhance(1.4)
+    rgb = rgb.filter(ImageFilter.UnsharpMask(radius=1.5, percent=145, threshold=2))
+    sharp = rgb.convert("RGBA")
+    sharp.putalpha(outlined.getchannel("A"))
+
+    sand = Image.new("RGBA", sharp.size, (247, 241, 230, 255))
+    sand.alpha_composite(sharp)
+    return sand.convert("RGB")
+
+
 LOGO_CLEAR = png_uri(logo_on_sand(abhs.ASSETS / "logo_stem_trimmed.png"))
+COVER_LOGO = png_uri(footer_logo_on_sand(abhs.ASSETS / "logo-cleaned.png"))
 COVER_HERO = abhs.data_uri("photos/cover-hero.jpg")
 
 EXTRA_CSS = """
+.cover .cover-content {
+  padding-top: 0.26in;
+}
 .cover-logo-wrap {
-  width: 92%;
-  margin: 0 auto 0.16in;
-  padding: calc(0.08in + 5px) 0.1in 0.07in;
-  /* Solid sand. CSS rgba over the darkened cover photo reads far thinner
-     than the alpha number (75% looked like ~40% in print). */
+  /* Same framed badge as steamspace.vercel.app .footer-logo-wrap, sized
+     just above the site's 228px box so the STEAM icons read in print. */
+  width: 2.6in;
+  max-width: 86%;
+  margin: 0 auto;
+  padding: 10px;
   background: var(--sand);
-  border: 2.5px solid var(--pine);
-  border-radius: 12px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  border: 2px solid var(--pine);
+  border-radius: 10px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
 }
 .cover-logo {
   width: 100%;
-  max-height: 1.42in;
-  object-fit: contain;
+  height: auto;
   display: block;
   margin: 0;
+  padding: 0;
   background: var(--sand);
+  object-fit: contain;
+}
+.cover-mid {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .cover-url {
-  margin-top: auto;
+  margin-top: 0.2in;
   font-family: var(--font-brand);
   font-size: 13.5pt;
   font-weight: 600;
@@ -242,11 +304,13 @@ def build() -> str:
     <div class="cover-shade"></div>
     <div class="cover-content">
       <div class="cover-logo-wrap">
-        <img class="cover-logo" src="{LOGO_CLEAR}" alt="STEAMSPACE at Fort Apache — Hands-on Field Trips">
+        <img class="cover-logo" src="{COVER_LOGO}" alt="STEAMSPACE at Fort Apache — Hands-on Field Trips">
       </div>
-      <div class="hero-text">2nd through 6th Grade</div>
-      <div class="cover-rule"></div>
-      <p class="hero-text" style="white-space: normal; max-width: 22ch;">Students build real projects tied to Arizona grade-level standards.</p>
+      <div class="cover-mid">
+        <div class="hero-text">2nd through 6th Grade</div>
+        <div class="cover-rule"></div>
+        <p class="hero-text" style="white-space: normal; max-width: 22ch;">Students build real projects tied to Arizona grade-level standards.</p>
+      </div>
       <div class="cover-url">{SITE_URL}</div>
       <p class="cover-place">Building 106 · Fort Apache Historic Park</p>
     </div>
