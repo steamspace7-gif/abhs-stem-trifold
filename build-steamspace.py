@@ -11,7 +11,7 @@ import io
 import subprocess
 from pathlib import Path
 
-from PIL import Image, ImageEnhance, ImageFilter
+from PIL import Image, ImageFilter
 
 import build as abhs
 
@@ -32,6 +32,10 @@ def png_uri(im: Image.Image) -> str:
     im.save(buf, format="PNG", optimize=True)
     encoded = base64.b64encode(buf.getvalue()).decode("ascii")
     return f"data:image/png;base64,{encoded}"
+
+
+SAND_RGB = (247, 241, 230)
+SAND = "#f7f1e6"
 
 
 def knock_out_black(path: Path, threshold: int = 28) -> Image.Image:
@@ -55,7 +59,7 @@ def logo_on_sand(path: Path) -> Image.Image:
     CSS fill is 100%.
     """
     logo = knock_out_black(path)
-    canvas = Image.new("RGBA", logo.size, (247, 241, 230, 255))
+    canvas = Image.new("RGBA", logo.size, (*SAND_RGB, 255))
     canvas.alpha_composite(logo)
     return canvas.convert("RGB")
 
@@ -66,6 +70,7 @@ def footer_logo_on_sand(path: Path, scale: int = 2) -> Image.Image:
     logo-cleaned.png’s arched letters already touch the top of the file, so a
     heavy dilated outline gets clipped. Pad first, then add a 1px stroke
     behind STEAMSPACE @ Ft Apache. Ribbon and STEAM icons stay as drawn.
+    Bake onto the same sand hex as the cover URL box so print matches.
     """
     src = Image.open(path).convert("RGBA")
     orig_w, orig_h = src.size
@@ -92,20 +97,14 @@ def footer_logo_on_sand(path: Path, scale: int = 2) -> Image.Image:
     letter_h = pad_top + int(orig_h * scale * 0.34)
     letter = Image.new("L", (width, height), 0)
     letter.paste(body.crop((0, 0, width, letter_h)), (0, 0))
-    # MaxFilter(3) at 2x ≈ a 1px outer stroke — thin enough not to blob.
     letter_stroke = letter.filter(ImageFilter.MaxFilter(3))
 
     outlined = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     outlined.paste(Image.new("RGBA", (width, height), (18, 16, 14, 255)), mask=letter_stroke)
     outlined.alpha_composite(src)
 
-    rgb = ImageEnhance.Sharpness(outlined.convert("RGB")).enhance(1.15)
-    rgb = rgb.filter(ImageFilter.UnsharpMask(radius=1.1, percent=95, threshold=3))
-    sharp = rgb.convert("RGBA")
-    sharp.putalpha(outlined.getchannel("A"))
-
-    sand = Image.new("RGBA", sharp.size, (247, 241, 230, 255))
-    sand.alpha_composite(sharp)
+    sand = Image.new("RGBA", outlined.size, (*SAND_RGB, 255))
+    sand.alpha_composite(outlined)
     return sand.convert("RGB")
 
 
@@ -124,7 +123,7 @@ EXTRA_CSS = """
   max-width: 86%;
   margin: 0 auto;
   padding: 10px;
-  background: var(--sand);
+  background: #f7f1e6;
   border: 2px solid var(--pine);
   border-radius: 10px;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
@@ -135,11 +134,11 @@ EXTRA_CSS = """
   display: block;
   margin: 0;
   padding: 0;
-  background: var(--sand);
+  background: #f7f1e6;
   object-fit: contain;
 }
 .cover-mid {
-  margin-top: 0.22in;
+  margin-top: 0.36in;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -151,7 +150,7 @@ EXTRA_CSS = """
   font-family: var(--font-brand);
   font-size: 13.5pt;
   font-weight: 600;
-  background: var(--sand);
+  background: #f7f1e6;
   color: var(--pine-deep);
   border: 2px solid var(--pine);
   padding: 0.09in 0.16in;
