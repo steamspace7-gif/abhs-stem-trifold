@@ -247,6 +247,15 @@ EXTRA_CSS = """
   line-height: 1.32;
 }
 .cover-media img { object-position: center 42%; }
+.coming-tile .coming-copy {
+  font-size: 7.8pt;
+  font-weight: 600;
+  color: var(--pine-deep);
+  line-height: 1.28;
+  white-space: normal;
+  padding: 0 0.08in;
+  margin: 0;
+}
 """
 
 
@@ -379,14 +388,14 @@ def build() -> str:
 {tile('tile_lasercut', 'Laser-Cut Boxes', '4TH GRADE')}
 {tile('tile_microbit', 'micro:bit Games', '5TH GRADE')}
 {tile('tile_puzzle', 'Puzzle Design', '6TH GRADE')}
-      <div class="web-tile">
-        <div class="web-label">Book online</div>
-        <div class="web-url">{SITE_URL}</div>
+      <div class="web-tile coming-tile">
+        <div class="web-label">Coming soon</div>
+        <p class="coming-copy">New projects include Air-Powered Rockets, Laser-cut Key Chains, and 3D printing.</p>
       </div>
     </div>
 
     <div class="tile-grid" style="grid-template-columns: 1fr; margin-bottom: 0.1in;">
-{tile('tile_building', 'Building 106 workshop', 'FORT APACHE HISTORIC PARK', 'tile--short')}
+{tile('tile_building', 'Building 106 STEAMSPACE', 'FORT APACHE HISTORIC PARK', 'tile--short')}
     </div>
 
     <div class="card" style="margin-top: auto; margin-bottom: 0.06in; padding: 0.1in 0.12in;">
@@ -423,6 +432,10 @@ def build() -> str:
       <div class="faq-item">
         <h4>What should students bring?</h4>
         <p>A signed permission slip, a water bottle, and a sack lunch if staying through lunch. We provide all project materials.</p>
+      </div>
+      <div class="faq-item">
+        <h4>How do we schedule a trip to the museum?</h4>
+        <p>Let us know on the Field Trip Interest Form and we will inform the Apache Cultural Center approximately what time and how many students are coming.</p>
       </div>
       <div class="faq-item">
         <h4>How do I schedule?</h4>
