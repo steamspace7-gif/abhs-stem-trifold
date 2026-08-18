@@ -22,6 +22,7 @@ PREVIEW = ROOT / "steamspace-brochure-preview.png"
 COVER = ROOT / "steamspace-brochure-cover.png"
 PAGE1 = ROOT / "steamspace-brochure-page-1.png"
 PAGE2 = ROOT / "steamspace-brochure-page-2.png"
+BACK = ROOT / "steamspace-brochure-back.png"
 
 SITE_URL = "steamspace.vercel.app"
 
@@ -196,6 +197,27 @@ EXTRA_CSS = """
   margin: 0.12in auto 0;
   filter: drop-shadow(0 2px 8px rgba(28, 42, 36, 0.18));
 }
+.steam-circles {
+  display: flex;
+  justify-content: center;
+  gap: 0.07in;
+  margin-top: 0.14in;
+}
+.steam-circles span {
+  width: 0.42in;
+  height: 0.42in;
+  border-radius: 50%;
+  font-family: var(--font-brand);
+  font-weight: 600;
+  font-size: 12.5pt;
+  line-height: 0.42in;
+  text-align: center;
+}
+.sc-s { background: #9fd0e8; color: #145239; }
+.sc-t { background: #1a8a8a; color: #fffdf8; }
+.sc-e { background: #f0b429; color: #1c2a24; }
+.sc-a { background: #e8dcc8; color: #1f6b4a; }
+.sc-m { background: #1f6b4a; color: #fffdf8; }
 .url-line {
   font-family: var(--font-brand);
   font-size: 12pt;
@@ -253,8 +275,8 @@ def build() -> str:
       <ul class="plain">
         <li>Signed permission slips</li>
         <li>Transportation</li>
-        <li>Sack lunch if staying through lunch</li>
-        <li>Weather-appropriate clothing</li>
+        <li>Sack lunch</li>
+        <li>Optional donation of project supplies.</li>
       </ul>
     </div>
 
@@ -264,7 +286,7 @@ def build() -> str:
         <li>All project materials and tools</li>
         <li>Grade-level making, coding, and design</li>
         <li>Optional Apache Cultural Center and Museum time</li>
-        <li>Optional Field Trip Prep interest inventory</li>
+        <li>Field trip prep materials including online interest inventory</li>
       </ul>
     </div>
 
@@ -273,16 +295,16 @@ def build() -> str:
     </div>
   </div>"""
 
-    outside_center = f"""  <!-- Back cover: how to book -->
+    outside_center = f"""  <!-- Back cover: booking steps and contact -->
   <div class="panel outside-center wash-sand">
     <div class="kicker">Book a Field Trip</div>
     <h2>Ready for your class?</h2>
     <p>Choose a project, pick a Tuesday or Thursday, and confirm arrival details with our team.</p>
 
 {plan_steps([
-        ("Choose a grade-level project", "2nd LEGO Paper Building · 3rd Paper Circuits · 4th Laser-Cut Boxes · 5th micro:bit Games · 6th Puzzle Design"),
-        ("Schedule your trip", "Check open dates and send the Field Trip Interest Form."),
-        ("Confirm with our team", "Finalize timing, museum visit options, and arrival."),
+        ("Choose a grade-level project", "2nd LEGO Paper Building · 3rd Paper Circuits · 4th Laser-Cut Boxes · 5th micro:bit Games · 6th Puzzle Design, or other grade-level project on the website."),
+        ("Schedule your trip", "Check open dates and send the Field Trip Interest Form online."),
+        ("Confirm with our team", "Finalize timing, museum visit options, and arrival. Use the contact information below."),
     ])}
 
     <div class="url-line">{SITE_URL}</div>
@@ -294,7 +316,13 @@ def build() -> str:
       <p style="margin-top: 0.07in; margin-bottom: 0;">Building 106<br>Fort Apache Historic Park</p>
     </div>
 
-    <img class="logo-footer" src="{LOGO_CLEAR}" alt="STEAMSPACE at Fort Apache — Hands-on Field Trips">
+    <div class="steam-circles" aria-label="STEAM: Science, Technology, Engineering, Arts, Mathematics">
+      <span class="sc-s">S</span>
+      <span class="sc-t">T</span>
+      <span class="sc-e">E</span>
+      <span class="sc-a">A</span>
+      <span class="sc-m">M</span>
+    </div>
   </div>"""
 
     outside_right = f"""  <!-- Front cover -->
@@ -487,10 +515,11 @@ def main() -> None:
         img.save(PREVIEW)
         width, height = img.size
         img.crop((round(width * 2 / 3), 0, width, height)).save(COVER)
+        img.crop((round(width / 3), 0, round(2 * width / 3), height)).save(BACK)
         img.save(PAGE1)
         if len(doc) > 1:
             doc[1].render(scale=2.5).to_pil().save(PAGE2)
-        print(f"Wrote {PREVIEW.name}, {COVER.name}, {PAGE1.name}, and {PAGE2.name}")
+        print(f"Wrote {PREVIEW.name}, {COVER.name}, {BACK.name}, {PAGE1.name}, and {PAGE2.name}")
     except Exception as exc:
         print(f"Preview raster skipped ({type(exc).__name__}: {exc})")
 
