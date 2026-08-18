@@ -510,15 +510,29 @@ def main() -> None:
     try:
         import pypdfium2 as pdfium
         doc = pdfium.PdfDocument(str(PDF))
-        page = doc[0]
-        img = page.render(scale=2.5).to_pil()
-        img.save(PREVIEW)
-        width, height = img.size
-        img.crop((round(width * 2 / 3), 0, width, height)).save(COVER)
-        img.crop((round(width / 3), 0, round(2 * width / 3), height)).save(BACK)
-        img.save(PAGE1)
+        page1 = doc[0].render(scale=2.5).to_pil()
+        page1.save(PAGE1)
+        width, height = page1.size
+        page1.crop((round(width * 2 / 3), 0, width, height)).save(COVER)
+        page1.crop((round(width / 3), 0, round(2 * width / 3), height)).save(BACK)
         if len(doc) > 1:
-            doc[1].render(scale=2.5).to_pil().save(PAGE2)
+            page2 = doc[1].render(scale=2.5).to_pil()
+            page2.save(PAGE2)
+            gap = 24
+            stacked_w = max(page1.width, page2.width)
+            stacked = Image.new(
+                "RGB",
+                (stacked_w, page1.height + page2.height + gap),
+                (255, 255, 255),
+            )
+            stacked.paste(page1.convert("RGB"), ((stacked_w - page1.width) // 2, 0))
+            stacked.paste(
+                page2.convert("RGB"),
+                ((stacked_w - page2.width) // 2, page1.height + gap),
+            )
+            stacked.save(PREVIEW)
+        else:
+            page1.save(PREVIEW)
         print(f"Wrote {PREVIEW.name}, {COVER.name}, {BACK.name}, {PAGE1.name}, and {PAGE2.name}")
     except Exception as exc:
         print(f"Preview raster skipped ({type(exc).__name__}: {exc})")
