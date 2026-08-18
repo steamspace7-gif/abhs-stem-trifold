@@ -146,14 +146,17 @@ EXTRA_CSS = """
 }
 .cover-url {
   margin-top: auto;
+  width: 2.6in;
+  max-width: 86%;
   font-family: var(--font-brand);
   font-size: 13.5pt;
   font-weight: 600;
-  background: var(--sun);
-  color: var(--ink);
+  background: var(--sand);
+  color: var(--pine-deep);
+  border: 2px solid var(--pine);
   padding: 0.09in 0.16in;
-  border-radius: 12px;
-  box-shadow: 0 8px 18px rgba(240, 180, 41, 0.45);
+  border-radius: 10px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
   letter-spacing: 0.01em;
 }
 .cover-place {
@@ -256,6 +259,9 @@ EXTRA_CSS = """
   padding: 0 0.08in;
   margin: 0;
 }
+.outside-center .tile--wide { aspect-ratio: 4 / 3; }
+.outside-center .url-line { margin: 0.1in 0 0.12in; }
+.outside-center .steam-circles { margin-top: 0.12in; }
 """
 
 
@@ -310,13 +316,13 @@ def build() -> str:
     <h2>Ready for your class?</h2>
     <p>Start on the site. Send the Field Trip Interest Form online, then use the contact below so we can confirm your date.</p>
 
-    <div class="url-line">{SITE_URL}</div>
-
-    <div class="tile-grid" style="grid-template-columns: 1fr; margin-bottom: 0.12in;">
+    <div class="tile-grid" style="grid-template-columns: 1fr; margin: 0.1in 0 0;">
 {tile('tile_brochurepic', 'Hands-on making at STEAMSPACE', '2ND–6TH GRADE', 'tile--wide')}
     </div>
 
-    <div class="cta-box" style="margin-top: auto;">
+    <div class="url-line">{SITE_URL}</div>
+
+    <div class="cta-box">
       <h3>Contact STEAMSPACE</h3>
       <p style="font-weight: 700; margin-bottom: 0.06in;">steamspace@wmabhs.org</p>
       <p>Call or text<br>928-299-0027<br>928-221-1934</p>
