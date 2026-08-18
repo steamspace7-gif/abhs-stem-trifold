@@ -11,7 +11,7 @@ import io
 import subprocess
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageEnhance, ImageFilter
+from PIL import Image, ImageEnhance, ImageFilter
 
 import build as abhs
 
@@ -57,48 +57,47 @@ def logo_on_sand(path: Path) -> Image.Image:
     return canvas.convert("RGB")
 
 
-def footer_logo_on_sand(
-    path: Path,
-    scale: int = 2,
-    stroke: int = 2,
-    letter_extra: int = 5,
-) -> Image.Image:
-    """Site footer mark: 2x upsample, thicker black letter outlines, sand bake.
+def footer_logo_on_sand(path: Path, scale: int = 2) -> Image.Image:
+    """Site footer mark on sand, with a thin black stroke on the wordmark only.
 
-    The live footer uses images/logo-cleaned.png in .footer-logo-wrap. Native
-    535x269 gets fuzzy on a print cover; a dilated black stroke behind the
-    STEAMSPACE @ Ft Apache lettering keeps the wordmark readable.
+    logo-cleaned.png’s arched letters already touch the top of the file, so a
+    heavy dilated outline gets clipped. Pad first, then add a 1px stroke
+    behind STEAMSPACE @ Ft Apache. Ribbon and STEAM icons stay as drawn.
     """
     src = Image.open(path).convert("RGBA")
+    orig_w, orig_h = src.size
+    src = src.resize((orig_w * scale, orig_h * scale), Image.Resampling.LANCZOS)
+    pad_x, pad_top, pad_bot = 8, 18, 4
+    canvas = Image.new(
+        "RGBA",
+        (src.width + pad_x * 2, src.height + pad_top + pad_bot),
+        (0, 0, 0, 0),
+    )
+    canvas.paste(src, (pad_x, pad_top))
+    src = canvas
     width, height = src.size
-    src = src.resize((width * scale, height * scale), Image.Resampling.LANCZOS)
+
     pixels = src.load()
-    width, height = src.size
     for y in range(height):
         for x in range(width):
             r, g, b, a = pixels[x, y]
             if a < 24:
                 pixels[x, y] = (0, 0, 0, 0)
-            elif r < 36 and g < 36 and b < 36:
-                pixels[x, y] = (16, 14, 12, 255 if a > 80 else a)
 
     alpha = src.getchannel("A")
     body = alpha.point(lambda value: 255 if value >= 40 else 0)
-    dilated = body.filter(ImageFilter.MaxFilter(stroke * 2 + 1))
-    letter_h = int(height * 0.42)
+    letter_h = pad_top + int(orig_h * scale * 0.34)
     letter = Image.new("L", (width, height), 0)
     letter.paste(body.crop((0, 0, width, letter_h)), (0, 0))
-    letter_dilated = letter.filter(
-        ImageFilter.MaxFilter((stroke + letter_extra) * 2 + 1)
-    )
-    stroke_mask = ImageChops.lighter(dilated, letter_dilated)
+    # MaxFilter(3) at 2x ≈ a 1px outer stroke — thin enough not to blob.
+    letter_stroke = letter.filter(ImageFilter.MaxFilter(3))
 
     outlined = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    outlined.paste(Image.new("RGBA", (width, height), (12, 10, 8, 255)), mask=stroke_mask)
+    outlined.paste(Image.new("RGBA", (width, height), (18, 16, 14, 255)), mask=letter_stroke)
     outlined.alpha_composite(src)
 
-    rgb = ImageEnhance.Sharpness(outlined.convert("RGB")).enhance(1.4)
-    rgb = rgb.filter(ImageFilter.UnsharpMask(radius=1.5, percent=145, threshold=2))
+    rgb = ImageEnhance.Sharpness(outlined.convert("RGB")).enhance(1.15)
+    rgb = rgb.filter(ImageFilter.UnsharpMask(radius=1.1, percent=95, threshold=3))
     sharp = rgb.convert("RGBA")
     sharp.putalpha(outlined.getchannel("A"))
 
@@ -137,13 +136,13 @@ EXTRA_CSS = """
   object-fit: contain;
 }
 .cover-mid {
-  margin-top: auto;
+  margin-top: 0.22in;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 .cover-url {
-  margin-top: 0.2in;
+  margin-top: auto;
   font-family: var(--font-brand);
   font-size: 13.5pt;
   font-weight: 600;
