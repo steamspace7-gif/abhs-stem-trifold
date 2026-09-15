@@ -4,7 +4,8 @@
 Outputs land in assets/photos/steamspace/ so ABHS STEM tiles in
 assets/photos/ stay untouched. Run before build-steamspace.py.
 
-Flickr originals: assets/photos/source/  (workshop + back-cover tiles only)
+Flickr originals: assets/photos/source/  (workshop tile only)
+Draft / shared repo photos: assets/photos/  (back-cover hands-on tile)
 Official site images: assets/photos/steamspace/source/
   lego-bear.jpg                  — 2nd grade LEGO Paper Building
   gallery-paper-circuits.jpg     — 3rd grade Paper Circuits
@@ -20,6 +21,7 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).parent
 FLICKR_SRC = ROOT / "assets" / "photos" / "source"
+PHOTOS_SRC = ROOT / "assets" / "photos"
 SITE_SRC = ROOT / "assets" / "photos" / "steamspace" / "source"
 OUT = ROOT / "assets" / "photos" / "steamspace"
 
@@ -37,13 +39,14 @@ TILES = [
         0.46,  # hands-on chassis build
     ),
     (
-        FLICKR_SRC,
-        "52210203520_cardboard-topo.jpg",
+        PHOTOS_SRC,
+        "brochurepic-hires.jpg",
         "tile-brochurepic.jpg",
         1600,
         4 / 3,  # back cover uses 4:3 via CSS
-        0.46,
-        0.40,  # painted cardboard topo model
+        0.50,
+        0.48,  # original draft hands-on making (scribble bot + LED)
+        SITE_SRC / "img_0383.jpg",  # fallback if draft file missing
     ),
     (
         SITE_SRC,
@@ -125,10 +128,16 @@ def prepare_tile(
     aspect: float,
     focus_x: float,
     focus_y: float,
+    fallback: Path | None = None,
 ) -> None:
     src = src_dir / src_name
     if not src.exists():
-        raise FileNotFoundError(f"Missing source photo: {src}")
+        if fallback and fallback.exists():
+            src = fallback
+            src_dir = fallback.parent
+            src_name = fallback.name
+        else:
+            raise FileNotFoundError(f"Missing source photo: {src_dir / src_name}")
     img = ImageOps.exif_transpose(Image.open(src).convert("RGB"))
     cropped = crop_to_aspect(img, aspect, focus_x, focus_y)
     height = round(width / aspect)
@@ -136,14 +145,20 @@ def prepare_tile(
     OUT.mkdir(parents=True, exist_ok=True)
     dest = OUT / out_name
     resized.save(dest, "JPEG", quality=92, optimize=True, subsampling=0)
-    label = "site" if src_dir == SITE_SRC else "flickr"
+    label = (
+        "site"
+        if src_dir == SITE_SRC
+        else "draft"
+        if src_dir == PHOTOS_SRC
+        else "flickr"
+    )
     print(f"  {out_name}: {resized.size[0]}x{resized.size[1]}  ({label}: {src_name})")
 
 
 def main() -> None:
     print("Preparing STEAMSPACE trifold photos …")
-    for args in TILES:
-        prepare_tile(*args)
+    for entry in TILES:
+        prepare_tile(*entry)
     print(f"Done — wrote {len(TILES)} files to {OUT.relative_to(ROOT)}/")
 
 
