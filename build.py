@@ -365,6 +365,8 @@ ul.plain li::before {
 
 .tile--wide { aspect-ratio: 16 / 8; }
 .tile--short { aspect-ratio: 16 / 6.2; }
+/* tile-vex is prepared with a looser crop; bias framing toward faces + field */
+.tile--vex img { object-position: center 38%; }
 
 /* URL companion for the last row of a tile grid — same footprint as a photo tile. */
 .web-tile {
@@ -731,7 +733,7 @@ def build() -> str:
     <p>Grade-level projects aligned with educational standards—using everyday materials to 3D printers and laser engraving.</p>
 
     <div class="tile-grid" style="grid-template-columns: 1fr; margin-bottom: 0.08in;">
-{tile('tile_vex', 'VEX robotics competitions', 'CLUBS &amp; COMPETITIONS', 'tile--short')}
+{tile('tile_vex', 'VEX robotics competitions', 'CLUBS &amp; COMPETITIONS', 'tile--short tile--vex')}
     </div>
 
     <div class="card">

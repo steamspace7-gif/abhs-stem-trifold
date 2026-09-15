@@ -37,9 +37,9 @@ TILES = [
         "54957714109_snas25.jpg",
         "tile-vex.jpg",
         1600,
-        16 / 6.2,  # tile--short
+        16 / 8.0,  # crop looser than tile--short (16/6.2); cover + object-position in CSS
         0.5,
-        0.36,  # pull crop up so centre faces (maroon shirt) aren't clipped
+        0.40,  # balance faces (upper) with field/robots (lower)
     ),
     (
         "35537136070_vex-iq-chassis.jpg",
