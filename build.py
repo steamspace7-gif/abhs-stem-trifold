@@ -313,6 +313,21 @@ ul.plain li::before {
   margin-bottom: 0;
 }
 
+.cover-disclaimer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.14in;
+  z-index: 2;
+  font-size: 6.5pt;
+  font-weight: 400;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.62);
+  text-align: center;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+}
+
 .icon-row { display: flex; gap: 0.06in; justify-content: center; margin: 0.04in 0 0; }
 .icon-row img { height: 0.45in; width: auto; }
 
@@ -682,6 +697,7 @@ def build() -> str:
       <img class="together-logo" src="{IMG['together']}" alt="Together We Build">
       <p class="cover-place">White Mountain Apache Tribe</p>
     </div>
+    <p class="cover-disclaimer">Portraits above are simulated by AI for privacy purposes</p>
   </div>"""
 
     inside_left = f"""  <!-- Inside left -->
