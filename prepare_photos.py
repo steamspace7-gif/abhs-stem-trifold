@@ -12,20 +12,23 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 ROOT = Path(__file__).parent
-SRC = ROOT / "assets" / "photos" / "source"
+FLICKR_SRC = ROOT / "assets" / "photos" / "source"
+PHOTOS_SRC = ROOT / "assets" / "photos"
 OUT = ROOT / "assets" / "photos"
 
-# (source filename, output filename, target width, aspect w/h, focus_x, focus_y)
+# (source dir, source filename, output filename, target width, aspect w/h, focus_x, focus_y)
 TILES = [
     (
-        "52210203520_cardboard-topo.jpg",
+        PHOTOS_SRC,
+        "brochurepic-hires.jpg",
         "tile-brochurepic.jpg",
         1600,
         16 / 8,  # tile--wide
-        0.48,
-        0.42,  # painted cardboard topo model + river (not laser-cut)
+        0.50,
+        0.48,  # original draft hands-on making (scribble bot + LED)
     ),
     (
+        FLICKR_SRC,
         "54946643368_lightburn.jpg",
         "tile-circuits.jpg",
         1200,
@@ -34,6 +37,7 @@ TILES = [
         0.42,  # LightBurn workspace centred on screen
     ),
     (
+        FLICKR_SRC,
         "54957714109_snas25.jpg",
         "tile-vex.jpg",
         1600,
@@ -42,6 +46,7 @@ TILES = [
         0.40,  # balance faces (upper) with field/robots (lower)
     ),
     (
+        FLICKR_SRC,
         "35537136070_vex-iq-chassis.jpg",
         "tile-teamwork.jpg",
         1600,
@@ -68,6 +73,7 @@ def crop_to_aspect(
 
 
 def prepare_tile(
+    src_dir: Path,
     src_name: str,
     out_name: str,
     width: int,
@@ -75,14 +81,15 @@ def prepare_tile(
     focus_x: float,
     focus_y: float,
 ) -> None:
-    src = SRC / src_name
+    src = src_dir / src_name
     img = ImageOps.exif_transpose(Image.open(src).convert("RGB"))
     cropped = crop_to_aspect(img, aspect, focus_x, focus_y)
     height = round(width / aspect)
     resized = cropped.resize((width, height), Image.Resampling.LANCZOS)
     dest = OUT / out_name
     resized.save(dest, "JPEG", quality=92, optimize=True, subsampling=0)
-    print(f"  {out_name}: {resized.size[0]}x{resized.size[1]}  (from {src_name})")
+    label = "draft" if src_dir == PHOTOS_SRC else "flickr"
+    print(f"  {out_name}: {resized.size[0]}x{resized.size[1]}  ({label}: {src_name})")
 
 
 def main() -> None:
