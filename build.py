@@ -313,6 +313,21 @@ ul.plain li::before {
   margin-bottom: 0;
 }
 
+.cover-disclaimer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.14in;
+  z-index: 2;
+  font-size: 6.5pt;
+  font-weight: 400;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.62);
+  text-align: center;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+}
+
 .icon-row { display: flex; gap: 0.06in; justify-content: center; margin: 0.04in 0 0; }
 .icon-row img { height: 0.45in; width: auto; }
 
@@ -350,6 +365,8 @@ ul.plain li::before {
 
 .tile--wide { aspect-ratio: 16 / 8; }
 .tile--short { aspect-ratio: 16 / 6.2; }
+/* tile-vex is prepared with a looser crop; bias framing toward faces + field */
+.tile--vex img { object-position: center 38%; }
 
 /* URL companion for the last row of a tile grid — same footprint as a photo tile. */
 .web-tile {
@@ -682,6 +699,7 @@ def build() -> str:
       <img class="together-logo" src="{IMG['together']}" alt="Together We Build">
       <p class="cover-place">White Mountain Apache Tribe</p>
     </div>
+    <p class="cover-disclaimer">Portraits above are simulated by AI for privacy purposes</p>
   </div>"""
 
     inside_left = f"""  <!-- Inside left -->
@@ -715,7 +733,7 @@ def build() -> str:
     <p>Grade-level projects aligned with educational standards—using everyday materials to 3D printers and laser engraving.</p>
 
     <div class="tile-grid" style="grid-template-columns: 1fr; margin-bottom: 0.08in;">
-{tile('tile_vex', 'VEX robotics build sessions', 'CLUBS &amp; COMPETITIONS', 'tile--short')}
+{tile('tile_vex', 'VEX robotics competitions', 'CLUBS &amp; COMPETITIONS', 'tile--short tile--vex')}
     </div>
 
     <div class="card">
