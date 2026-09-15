@@ -4,6 +4,10 @@
 Same print setup as the ABHS STEM brochure (letter-size, 3-panel fold),
 but the copy is only about STEAMSPACE field trips — no ABHS STEM program
 content. The live site URL is printed on the cover, back, and inside.
+
+Rebuild:
+  python3 prepare-steamspace-photos.py   # crop Flickr originals
+  python3 build-steamspace.py            # HTML, PDF, preview PNGs
 """
 
 import base64
@@ -16,6 +20,7 @@ from PIL import Image, ImageFilter
 import build as abhs
 
 ROOT = Path(__file__).parent
+STEAM_PHOTOS = ROOT / "assets" / "photos" / "steamspace"
 OUT = ROOT / "steamspace-brochure.html"
 PDF = ROOT / "steamspace-brochure.pdf"
 PREVIEW = ROOT / "steamspace-brochure-preview.png"
@@ -122,9 +127,36 @@ def sand_blend_photo(path: Path, amount: float = 0.26) -> Image.Image:
     return Image.blend(photo, wash, amount)
 
 
+def photo_uri(filename: str) -> str:
+    path = STEAM_PHOTOS / filename
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Missing {path.relative_to(ROOT)} — run prepare-steamspace-photos.py first"
+        )
+    buf = io.BytesIO()
+    Image.open(path).convert("RGB").save(buf, format="JPEG", quality=92, optimize=True)
+    encoded = base64.b64encode(buf.getvalue()).decode("ascii")
+    return f"data:image/jpeg;base64,{encoded}"
+
+
+def load_steamspace_images() -> tuple[dict[str, str], str]:
+    """Load STEAMSPACE photo data URIs (call after prepare-steamspace-photos.py)."""
+    imgs = {
+        "tile_workshop": photo_uri("tile-workshop.jpg"),
+        "tile_brochurepic": photo_uri("tile-brochurepic.jpg"),
+        "tile_lego": photo_uri("tile-lego.jpg"),
+        "tile_circuits": photo_uri("tile-circuits.jpg"),
+        "tile_lasercut": photo_uri("tile-lasercut.jpg"),
+        "tile_microbit": photo_uri("tile-microbit.jpg"),
+        "tile_puzzle": photo_uri("tile-puzzle.jpg"),
+        "tile_building": photo_uri("tile-building106.jpg"),
+    }
+    cover = jpeg_uri(sand_blend_photo(STEAM_PHOTOS / "cover-hero.jpg"))
+    return imgs, cover
+
+
 LOGO_CLEAR = png_uri(logo_on_sand(abhs.ASSETS / "logo_stem_trimmed.png"))
 COVER_LOGO = png_uri(footer_logo_on_sand(abhs.ASSETS / "logo-cleaned.png"))
-COVER_HERO = jpeg_uri(sand_blend_photo(abhs.ASSETS / "photos/cover-hero.jpg"))
 
 EXTRA_CSS = """
 .cover .cover-content {
@@ -293,10 +325,26 @@ EXTRA_CSS = """
 """
 
 
+def steamspace_tile(
+    imgs: dict[str, str], img_key: str, title: str, grade: str, extra_class: str = ""
+) -> str:
+    cls = f"tile {extra_class}".strip()
+    return f"""      <div class="{cls}">
+        <img src="{imgs[img_key]}" alt="{title}">
+        <div class="tile-cap">
+          <div class="tile-title">{title}</div>
+          <div class="tile-grade">{grade}</div>
+        </div>
+      </div>"""
+
+
 def build() -> str:
+    imgs, cover_hero = load_steamspace_images()
     css = abhs.CSS.replace("QUOTE_BG", abhs.IMG["quote_bg"]) + EXTRA_CSS
-    img = abhs.IMG
-    tile = abhs.tile
+
+    def tile(img_key: str, title: str, grade: str, extra_class: str = "") -> str:
+        return steamspace_tile(imgs, img_key, title, grade, extra_class)
+
     plan_steps = abhs.plan_steps
     icon_row = abhs.icon_row
 
@@ -307,7 +355,7 @@ def build() -> str:
     <p>Bring a class to Building 106 for a hands-on field trip tied to Arizona grade-level standards.</p>
 
     <div class="fact-grid">
-      <div class="fact"><strong>Tue &amp; Thu</strong><span>During the school year</span></div>
+      <div class="fact"><strong>Tue &amp; Thu</strong><span>Free · school year</span></div>
       <div class="fact"><strong>3–4 hours</strong><span>Typical field trip</span></div>
       <div class="fact"><strong>20 students</strong><span>Split larger classes</span></div>
       <div class="fact"><strong>1 adult / 10</strong><span>Chaperones required</span></div>
@@ -352,8 +400,8 @@ def build() -> str:
 
     <div class="cta-box">
       <h3>Contact STEAMSPACE</h3>
-      <p style="font-weight: 700; margin-bottom: 0.06in;">steamspace@wmabhs.org</p>
-      <p>Call or text<br>928-299-0027<br>928-221-1934</p>
+      <p style="font-weight: 700; margin-bottom: 0.04in;">steamspace@wmabhs.org<br>bgoode@wmabhs.org</p>
+      <p>Call or text<br>928-299-0027 · 928-221-1934</p>
       <p style="margin-top: 0.07in; margin-bottom: 0;">Building 106<br>Fort Apache Historic Park</p>
     </div>
 
@@ -369,7 +417,7 @@ def build() -> str:
     outside_right = f"""  <!-- Front cover -->
   <div class="panel outside-right cover">
     <div class="cover-media">
-      <img src="{COVER_HERO}" alt="">
+      <img src="{cover_hero}" alt="">
     </div>
     <div class="cover-shade"></div>
     <div class="cover-content">
