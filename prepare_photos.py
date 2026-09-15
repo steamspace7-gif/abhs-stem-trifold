@@ -39,7 +39,7 @@ TILES = [
         1600,
         16 / 6.2,  # tile--short
         0.5,
-        0.52,  # robots + field action in lower half
+        0.36,  # pull crop up so centre faces (maroon shirt) aren't clipped
     ),
     (
         "35537136070_vex-iq-chassis.jpg",

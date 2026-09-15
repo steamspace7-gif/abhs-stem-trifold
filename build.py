@@ -731,7 +731,7 @@ def build() -> str:
     <p>Grade-level projects aligned with educational standards—using everyday materials to 3D printers and laser engraving.</p>
 
     <div class="tile-grid" style="grid-template-columns: 1fr; margin-bottom: 0.08in;">
-{tile('tile_vex', 'VEX robotics build sessions', 'CLUBS &amp; COMPETITIONS', 'tile--short')}
+{tile('tile_vex', 'VEX robotics competitions', 'CLUBS &amp; COMPETITIONS', 'tile--short')}
     </div>
 
     <div class="card">
