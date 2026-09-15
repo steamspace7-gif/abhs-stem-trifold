@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""Crop source photos for the STEAMSPACE teacher trifold.
+
+Outputs land in assets/photos/steamspace/ so ABHS STEM tiles in
+assets/photos/ stay untouched. Run before build-steamspace.py.
+
+Flickr originals: assets/photos/source/  (workshop tile only)
+Draft / shared repo photos: assets/photos/  (back-cover hands-on tile)
+Official site images: assets/photos/steamspace/source/
+  lego-bear.jpg                  — 2nd grade LEGO Paper Building
+  gallery-paper-circuits.jpg     — 3rd grade Paper Circuits
+  gallery-lasercut-boxes.jpg     — 4th grade Laser Cut Boxes
+  gallery-microbit-game.jpg      — 5th grade micro:bit Game
+  puzzlepic1_edited.jpg          — 6th grade Puzzle Design
+  gallery-building-106-clean.png — Building 106 exterior
+"""
+
+from pathlib import Path
+
+from PIL import Image, ImageOps
+
+ROOT = Path(__file__).parent
+FLICKR_SRC = ROOT / "assets" / "photos" / "source"
+PHOTOS_SRC = ROOT / "assets" / "photos"
+SITE_SRC = ROOT / "assets" / "photos" / "steamspace" / "source"
+OUT = ROOT / "assets" / "photos" / "steamspace"
+
+# (source dir, source filename, output filename, target width, aspect w/h, focus_x, focus_y)
+# Cover uses assets/photos/cover-hero.jpg (sand-warmed AI portrait) via build-steamspace.py.
+
+TILES = [
+    (
+        FLICKR_SRC,
+        "35537136070_vex-iq-chassis.jpg",
+        "tile-workshop.jpg",
+        1600,
+        16 / 8,
+        0.52,
+        0.46,  # hands-on chassis build
+    ),
+    (
+        PHOTOS_SRC,
+        "brochurepic-hires.jpg",
+        "tile-brochurepic.jpg",
+        1600,
+        4 / 3,  # back cover uses 4:3 via CSS
+        0.50,
+        0.48,  # original draft hands-on making (scribble bot + LED)
+        SITE_SRC / "img_0383.jpg",  # fallback if draft file missing
+    ),
+    (
+        SITE_SRC,
+        "lego-bear.jpg",
+        "tile-lego.jpg",
+        1200,
+        4 / 3,
+        0.50,
+        0.48,  # official site — 2nd grade LEGO paper building
+    ),
+    (
+        SITE_SRC,
+        "gallery-paper-circuits.jpg",
+        "tile-circuits.jpg",
+        1200,
+        4 / 3,
+        0.50,
+        0.48,  # official site — 3rd grade paper circuits
+    ),
+    (
+        SITE_SRC,
+        "gallery-lasercut-boxes.jpg",
+        "tile-lasercut.jpg",
+        1200,
+        4 / 3,
+        0.50,
+        0.48,  # official site — 4th grade laser-cut boxes
+    ),
+    (
+        SITE_SRC,
+        "gallery-microbit-game.jpg",
+        "tile-microbit.jpg",
+        1200,
+        4 / 3,
+        0.50,
+        0.48,  # official site — 5th grade micro:bit game
+    ),
+    (
+        SITE_SRC,
+        "puzzlepic1_edited.jpg",
+        "tile-puzzle.jpg",
+        1200,
+        4 / 3,
+        0.50,
+        0.45,  # official site — 6th grade puzzle design
+    ),
+    (
+        SITE_SRC,
+        "gallery-building-106-clean.png",
+        "tile-building106.jpg",
+        1600,
+        16 / 6.2,  # tile--short
+        0.50,
+        0.48,  # official site — Building 106 exterior
+    ),
+]
+
+
+def crop_to_aspect(
+    img: Image.Image, aspect: float, focus_x: float = 0.5, focus_y: float = 0.5
+) -> Image.Image:
+    """Center-biased crop; focus 0=left/top, 1=right/bottom."""
+    w, h = img.size
+    current = w / h
+    if current > aspect:
+        new_w = int(h * aspect)
+        x0 = max(0, min(w - new_w, int((w - new_w) * focus_x)))
+        return img.crop((x0, 0, x0 + new_w, h))
+    new_h = int(w / aspect)
+    y0 = max(0, min(h - new_h, int((h - new_h) * focus_y)))
+    return img.crop((0, y0, w, y0 + new_h))
+
+
+def prepare_tile(
+    src_dir: Path,
+    src_name: str,
+    out_name: str,
+    width: int,
+    aspect: float,
+    focus_x: float,
+    focus_y: float,
+    fallback: Path | None = None,
+) -> None:
+    src = src_dir / src_name
+    if not src.exists():
+        if fallback and fallback.exists():
+            src = fallback
+            src_dir = fallback.parent
+            src_name = fallback.name
+        else:
+            raise FileNotFoundError(f"Missing source photo: {src_dir / src_name}")
+    img = ImageOps.exif_transpose(Image.open(src).convert("RGB"))
+    cropped = crop_to_aspect(img, aspect, focus_x, focus_y)
+    height = round(width / aspect)
+    resized = cropped.resize((width, height), Image.Resampling.LANCZOS)
+    OUT.mkdir(parents=True, exist_ok=True)
+    dest = OUT / out_name
+    resized.save(dest, "JPEG", quality=92, optimize=True, subsampling=0)
+    label = (
+        "site"
+        if src_dir == SITE_SRC
+        else "draft"
+        if src_dir == PHOTOS_SRC
+        else "flickr"
+    )
+    print(f"  {out_name}: {resized.size[0]}x{resized.size[1]}  ({label}: {src_name})")
+
+
+def main() -> None:
+    print("Preparing STEAMSPACE trifold photos …")
+    for entry in TILES:
+        prepare_tile(*entry)
+    print(f"Done — wrote {len(TILES)} files to {OUT.relative_to(ROOT)}/")
+
+
+if __name__ == "__main__":
+    main()
