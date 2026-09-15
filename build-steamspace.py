@@ -151,7 +151,8 @@ def load_steamspace_images() -> tuple[dict[str, str], str]:
         "tile_puzzle": photo_uri("tile-puzzle.jpg"),
         "tile_building": photo_uri("tile-building106.jpg"),
     }
-    cover = jpeg_uri(sand_blend_photo(STEAM_PHOTOS / "cover-hero.jpg"))
+    # Original draft cover: sand-washed AI classroom portrait (not Flickr hero).
+    cover = jpeg_uri(sand_blend_photo(abhs.ASSETS / "photos/cover-hero.jpg"))
     return imgs, cover
 
 
@@ -432,6 +433,7 @@ def build() -> str:
       <div class="cover-url">{SITE_URL}</div>
       <p class="cover-place">Building 106 · Fort Apache Historic Park</p>
     </div>
+    <p class="cover-disclaimer">Portraits above are simulated by AI for privacy purposes</p>
   </div>"""
 
     inside_left = f"""  <!-- Inside left: what STEAMSPACE is -->

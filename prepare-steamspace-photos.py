@@ -20,16 +20,9 @@ SITE_SRC = ROOT / "assets" / "photos" / "steamspace" / "source"
 OUT = ROOT / "assets" / "photos" / "steamspace"
 
 # (source dir, source filename, output filename, target width, aspect w/h, focus_x, focus_y)
+# Cover uses assets/photos/cover-hero.jpg (sand-warmed AI portrait) via build-steamspace.py.
+
 TILES = [
-    (
-        FLICKR_SRC,
-        "54946755080_laptop-star.jpg",
-        "cover-hero.jpg",
-        1100,
-        3.6667 / 8.5,  # trifold cover panel (portrait)
-        0.5,
-        0.34,  # laptop + star project, keep hands low
-    ),
     (
         FLICKR_SRC,
         "35537136070_vex-iq-chassis.jpg",
