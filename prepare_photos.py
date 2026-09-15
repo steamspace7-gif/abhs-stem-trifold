@@ -18,12 +18,12 @@ OUT = ROOT / "assets" / "photos"
 # (source filename, output filename, target width, aspect w/h, focus_x, focus_y)
 TILES = [
     (
-        "54946750635_laser-cut-box.jpg",
+        "52210203520_cardboard-topo.jpg",
         "tile-brochurepic.jpg",
         1600,
         16 / 8,  # tile--wide
-        0.5,
-        0.38,  # hands + box assembly in upper-mid frame
+        0.48,
+        0.42,  # painted cardboard topo model + river (not laser-cut)
     ),
     (
         "54946643368_lightburn.jpg",
@@ -42,12 +42,12 @@ TILES = [
         0.52,  # robots + field action in lower half
     ),
     (
-        "54156354508_snas24.jpg",
+        "35537136070_vex-iq-chassis.jpg",
         "tile-teamwork.jpg",
         1600,
         16 / 8,  # tile--wide
         0.5,
-        0.42,  # hardhat backs + arena from elevated angle
+        0.44,  # hands-on VEX IQ chassis build (not competition)
     ),
 ]
 
