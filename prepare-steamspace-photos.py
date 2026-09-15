@@ -4,10 +4,14 @@
 Outputs land in assets/photos/steamspace/ so ABHS STEM tiles in
 assets/photos/ stay untouched. Run before build-steamspace.py.
 
-Flickr originals: assets/photos/source/
+Flickr originals: assets/photos/source/  (workshop + back-cover tiles only)
 Official site images: assets/photos/steamspace/source/
-  puzzlepic1_edited.jpg          — 6th grade Puzzle Design (steamspace.vercel.app)
-  gallery-building-106-clean.png — Building 106 (steamspace.vercel.app)
+  lego-bear.jpg                  — 2nd grade LEGO Paper Building
+  gallery-paper-circuits.jpg     — 3rd grade Paper Circuits
+  gallery-lasercut-boxes.jpg     — 4th grade Laser Cut Boxes
+  gallery-microbit-game.jpg      — 5th grade micro:bit Game
+  puzzlepic1_edited.jpg          — 6th grade Puzzle Design
+  gallery-building-106-clean.png — Building 106 exterior
 """
 
 from pathlib import Path
@@ -42,40 +46,40 @@ TILES = [
         0.40,  # painted cardboard topo model
     ),
     (
-        FLICKR_SRC,
-        "54830501938_alt-build.jpg",
+        SITE_SRC,
+        "lego-bear.jpg",
         "tile-lego.jpg",
         1200,
         4 / 3,
-        0.48,
-        0.42,  # tabletop building / making
+        0.50,
+        0.48,  # official site — 2nd grade LEGO paper building
     ),
     (
-        FLICKR_SRC,
-        "35884396266_pink-leds.jpg",
+        SITE_SRC,
+        "gallery-paper-circuits.jpg",
         "tile-circuits.jpg",
         1200,
         4 / 3,
         0.50,
-        0.44,  # paper circuits + LEDs
+        0.48,  # official site — 3rd grade paper circuits
     ),
     (
-        FLICKR_SRC,
-        "54946750635_laser-cut-box.jpg",
+        SITE_SRC,
+        "gallery-lasercut-boxes.jpg",
         "tile-lasercut.jpg",
         1200,
         4 / 3,
         0.50,
-        0.38,  # laser-cut box on bed
+        0.48,  # official site — 4th grade laser-cut boxes
     ),
     (
-        FLICKR_SRC,
-        "54946643368_lightburn.jpg",
+        SITE_SRC,
+        "gallery-microbit-game.jpg",
         "tile-microbit.jpg",
         1200,
         4 / 3,
-        0.48,
-        0.40,  # LightBurn / digital design screen
+        0.50,
+        0.48,  # official site — 5th grade micro:bit game
     ),
     (
         SITE_SRC,
